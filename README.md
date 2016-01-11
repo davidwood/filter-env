@@ -2,6 +2,10 @@
 
 `filter-env` iterates over `process.env` and returns an object containing environment variables whose name matches a regular expression. Optionally, it can parse environment variable values as JSON.
 
+[![Circle CI](https://circleci.com/gh/davidwood/filter-env/tree/master.svg?style=svg)](https://circleci.com/gh/davidwood/filter-env/tree/master)
+[![bitHound Overall Score](https://www.bithound.io/github/davidwood/filter-env/badges/score.svg)](https://www.bithound.io/github/davidwood/filter-env)
+[![bitHound Dependencies](https://www.bithound.io/github/davidwood/filter-env/badges/dependencies.svg)](https://www.bithound.io/github/davidwood/filter-env/master/dependencies/npm)
+
 ## Usage
 
 ```

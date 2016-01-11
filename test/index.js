@@ -7,6 +7,16 @@ const assert = require('assert');
 const _ = require('lodash');
 const filterEnv = require('../');
 
+/**
+ * Filter to keys starting with TEST
+ *
+ * @param   {String}    key   Key to test
+ * @retuens {Boolean}   true if the key starts with TEST
+ */
+function filter(key) {
+  return key.substring(0, 4) === 'TEST';
+}
+
 describe('filterEnv(pattern, [options])', () => {
   before(() => {
     process.env.TEST_STRING_VALUE = 'TestString';
@@ -88,7 +98,8 @@ describe('filterEnv(pattern, [options])', () => {
   });
 
   it('should accept a function to format the key', () => {
-    const filtered = filterEnv((key) => { return key.substring(0, 4) === 'TEST'; }, { json: true, format: (key) => { return _.camelCase(key.replace(/^TEST_/, '')); } });
+    const format = (key) => { return _.camelCase(key.replace(/^TEST_/, '')); };
+    const filtered = filterEnv(filter, { json: true, format });
     const expected = {
       stringValue: 'TestString',
       numberValue: 123.45,
@@ -101,7 +112,8 @@ describe('filterEnv(pattern, [options])', () => {
 
 
   it('should not add a property that already exists', () => {
-    const filtered = filterEnv((key) => { return key.substring(0, 4) === 'TEST'; }, { json: true, format: (key) => { return key.replace('INTEGER', 'NUMBER'); } });
+    const format = (key) => { return key.replace('INTEGER', 'NUMBER'); };
+    const filtered = filterEnv(filter, { json: true, format });
     const expected = {
       TEST_STRING_VALUE: 'TestString',
       TEST_NUMBER_VALUE: 123.45,
@@ -112,7 +124,7 @@ describe('filterEnv(pattern, [options])', () => {
   });
 
   it('should freeze the returned object is the freeze option is true', () => {
-    const filtered = filterEnv((key) => { return key.substring(0, 4) === 'TEST'; }, { json: true, freeze: true });
+    const filtered = filterEnv(filter, { json: true, freeze: true });
     const expected = {
       TEST_STRING_VALUE: 'TestString',
       TEST_NUMBER_VALUE: 123.45,
