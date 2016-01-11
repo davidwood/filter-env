@@ -1,0 +1,9 @@
+machine:
+  node:
+    version: 4.2.4
+general:
+  artifacts:
+    - "coverage"
+test:
+  override:
+    - npm test --coverage

@@ -1,0 +1,38 @@
+{
+  "name": "filter-env",
+  "version": "1.0.0",
+  "description": "Filter environment variables by pattern",
+  "main": "index.js",
+  "scripts": {
+    "lint": "eslint .",
+    "test": "NODE_ENV=test istanbul test _mocha -- --check-leaks"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/davidwood/filter-env.git"
+  },
+  "keywords": [
+    "config",
+    "env",
+    "environment",
+    "json"
+  ],
+  "author": "David Wood <bitprobe@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/davidwood/filter-env/issues"
+  },
+  "homepage": "https://github.com/davidwood/filter-env#readme",
+  "devDependencies": {
+    "eslint": "^1.10.3",
+    "eslint-config-airbnb": "^2.1.1",
+    "istanbul": "^0.4.1",
+    "mocha": "^2.3.4"
+  },
+  "engines": {
+    "node": ">=4.0.0"
+  },
+  "dependencies": {
+    "lodash": "^3.10.1"
+  }
+}
