@@ -1,6 +1,6 @@
 {
   "name": "filter-env",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Filter environment variables by pattern",
   "main": "index.js",
   "scripts": {
