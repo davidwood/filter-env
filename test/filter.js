@@ -5,8 +5,21 @@
  */
 const assert = require('assert');
 const _ = require('lodash');
-const filterEnv = require('../');
 const filter = require('../lib/filter');
+
+/**
+ * Constants
+ */
+const ENV = Object.freeze({
+  TEST_STRING_VALUE: 'TestString',
+  TEST_NUMBER_VALUE: '123.45',
+  TEST_INTEGER_VALUE: 123,
+  TEST_ARRAY_VALUE: '["alpha","bravo","charlie"]',
+  TEST_OBJECT_VALUE: '{"alpha":"a","bravo":{"charlie":"c","delta":"d"},"echo":"e"}',
+  TEST_EMPTY_VALUE: '',
+  BAD_OBJECT_VALUE: '{"alpha": "a",',
+  BAD_ARRAY_VALUE: '["alpha",',
+});
 
 /**
  * Filter to keys starting with TEST
@@ -18,27 +31,29 @@ function filterKeys(key) {
   return key.substring(0, 4) === 'TEST';
 }
 
-describe('filterEnv(pattern, [options])', () => {
-  before(() => {
-    process.env.TEST_STRING_VALUE = 'TestString';
-    process.env.TEST_NUMBER_VALUE = '123.45';
-    process.env.TEST_INTEGER_VALUE = 123;
-    process.env.TEST_ARRAY_VALUE = '["alpha","bravo","charlie"]';
-    process.env.TEST_OBJECT_VALUE = '{"alpha":"a","bravo":{"charlie":"c","delta":"d"},"echo":"e"}';
-    process.env.TEST_EMPTY_VALUE = '';
-    process.env.BAD_OBJECT_VALUE = '{"alpha": "a",';
-    process.env.BAD_ARRAY_VALUE = '["alpha",';
+describe('filter(env, pattern, [options])', () => {
+  it('should export a function', () => {
+    assert.strictEqual(_.isFunction(filter), true);
   });
 
-  it('should export a function', () => {
-    assert.strictEqual(_.isFunction(filterEnv), true);
+  it('should throw an error if the env is not an object', () => {
+    [true, false, '', 'test', 123, null, undefined].forEach((value) => {
+      let error;
+      try {
+        filter(value);
+      } catch (e) {
+        error = e;
+      }
+      assert.strictEqual(error instanceof TypeError, true);
+      assert.strictEqual(error.message, 'Invalid environment');
+    });
   });
 
   it('should throw an error if the pattern is not a function or regular expression', () => {
     [true, false, '', 'test', 123, new Date(), {}, [], null, undefined].forEach((value) => {
       let error;
       try {
-        filterEnv(value);
+        filter({}, value);
       } catch (e) {
         error = e;
       }
@@ -48,7 +63,7 @@ describe('filterEnv(pattern, [options])', () => {
   });
 
   it('should return an objects with keys for which the pattern function returns true', () => {
-    const filtered = filterEnv(filterKeys);
+    const filtered = filter(ENV, filterKeys);
     const expected = {
       TEST_STRING_VALUE: 'TestString',
       TEST_NUMBER_VALUE: '123.45',
@@ -61,7 +76,7 @@ describe('filterEnv(pattern, [options])', () => {
   });
 
   it('should return an objects with keys for which the regular expressions returns true', () => {
-    const filtered = filterEnv(/^test_/i);
+    const filtered = filter(ENV, /^test_/i);
     const expected = {
       TEST_STRING_VALUE: 'TestString',
       TEST_NUMBER_VALUE: '123.45',
@@ -74,7 +89,7 @@ describe('filterEnv(pattern, [options])', () => {
   });
 
   it('should parse the values as JSON if the json option is true', () => {
-    const filtered = filterEnv(filterKeys, { json: true });
+    const filtered = filter(ENV, filterKeys, { json: true });
     const expected = {
       TEST_STRING_VALUE: 'TestString',
       TEST_NUMBER_VALUE: 123.45,
@@ -89,7 +104,7 @@ describe('filterEnv(pattern, [options])', () => {
     [/^BAD_OBJECT_/, /^BAD_ARRAY_/].forEach((pattern) => {
       let error;
       try {
-        filterEnv(pattern, { json: true });
+        filter(ENV, pattern, { json: true });
       } catch (e) {
         error = e;
       }
@@ -100,7 +115,7 @@ describe('filterEnv(pattern, [options])', () => {
 
   it('should accept a function to format the key', () => {
     const format = (key) => { return _.camelCase(key.replace(/^TEST_/, '')); };
-    const filtered = filterEnv(filterKeys, { json: true, format });
+    const filtered = filter(ENV, filterKeys, { json: true, format });
     const expected = {
       stringValue: 'TestString',
       numberValue: 123.45,
@@ -114,7 +129,7 @@ describe('filterEnv(pattern, [options])', () => {
 
   it('should not add a property that already exists', () => {
     const format = (key) => { return key.replace('INTEGER', 'NUMBER'); };
-    const filtered = filterEnv(filterKeys, { json: true, format });
+    const filtered = filter(ENV, filterKeys, { json: true, format });
     const expected = {
       TEST_STRING_VALUE: 'TestString',
       TEST_NUMBER_VALUE: 123.45,
@@ -125,7 +140,7 @@ describe('filterEnv(pattern, [options])', () => {
   });
 
   it('should freeze the returned object is the freeze option is true', () => {
-    const filtered = filterEnv(filterKeys, { json: true, freeze: true });
+    const filtered = filter(ENV, filterKeys, { json: true, freeze: true });
     const expected = {
       TEST_STRING_VALUE: 'TestString',
       TEST_NUMBER_VALUE: 123.45,
@@ -136,11 +151,5 @@ describe('filterEnv(pattern, [options])', () => {
     assert.deepEqual(filtered, expected);
     assert.strictEqual(Object.isFrozen(filtered), true);
     assert.strictEqual(Object.isFrozen(filtered.TEST_OBJECT_VALUE), true);
-  });
-
-  describe('.filter', () => {
-    it('should expose the filter function', () => {
-      assert.strictEqual(filterEnv.filter, filter);
-    });
   });
 });
