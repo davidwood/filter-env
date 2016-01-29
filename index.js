@@ -12,7 +12,7 @@ const filter = require('./lib/filter');
  * @param   {Object}          [options]   Filter options
  * @returns {Object}          filtered configuration
  */
-module.exports = (validate, options) => {
+module.exports = function filterEnv(validate, options) {
   return filter(process.env, validate, options);
 };
 

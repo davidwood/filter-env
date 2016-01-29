@@ -99,7 +99,7 @@ describe('filterEnv(pattern, [options])', () => {
   });
 
   it('should accept a function to format the key', () => {
-    const format = (key) => { return _.camelCase(key.replace(/^TEST_/, '')); };
+    const format = (key) => _.camelCase(key.replace(/^TEST_/, ''));
     const filtered = filterEnv(filterKeys, { json: true, format });
     const expected = {
       stringValue: 'TestString',
@@ -113,7 +113,7 @@ describe('filterEnv(pattern, [options])', () => {
 
 
   it('should not add a property that already exists', () => {
-    const format = (key) => { return key.replace('INTEGER', 'NUMBER'); };
+    const format = (key) => key.replace('INTEGER', 'NUMBER');
     const filtered = filterEnv(filterKeys, { json: true, format });
     const expected = {
       TEST_STRING_VALUE: 'TestString',
